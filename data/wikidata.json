@@ -31,7 +31,7 @@
       "cost": {
         "coins": 3,
         "debt": 0,
-        "potion": false,
+        "potion": true,
         "special": null
       },
       "editions": [
@@ -54,7 +54,7 @@
       "cost": {
         "coins": 2,
         "debt": 0,
-        "potion": false,
+        "potion": true,
         "special": null
       },
       "editions": [
@@ -101,7 +101,7 @@
       "cost": {
         "coins": 3,
         "debt": 0,
-        "potion": false,
+        "potion": true,
         "special": null
       },
       "editions": [
@@ -124,7 +124,7 @@
       "cost": {
         "coins": 4,
         "debt": 0,
-        "potion": false,
+        "potion": true,
         "special": null
       },
       "editions": [
@@ -170,7 +170,7 @@
       "cost": {
         "coins": 3,
         "debt": 0,
-        "potion": false,
+        "potion": true,
         "special": null
       },
       "editions": [
@@ -193,7 +193,7 @@
       "cost": {
         "coins": 6,
         "debt": 0,
-        "potion": false,
+        "potion": true,
         "special": null
       },
       "editions": [
@@ -217,7 +217,7 @@
       "cost": {
         "coins": 2,
         "debt": 0,
-        "potion": false,
+        "potion": true,
         "special": null
       },
       "editions": [
@@ -240,7 +240,7 @@
       "cost": {
         "coins": null,
         "debt": 0,
-        "potion": false,
+        "potion": true,
         "special": null
       },
       "editions": [
@@ -263,7 +263,7 @@
       "cost": {
         "coins": 2,
         "debt": 0,
-        "potion": false,
+        "potion": true,
         "special": null
       },
       "editions": [
@@ -286,7 +286,7 @@
       "cost": {
         "coins": null,
         "debt": 0,
-        "potion": false,
+        "potion": true,
         "special": null
       },
       "editions": [

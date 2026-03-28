@@ -269,7 +269,7 @@ async function getWikiData(): Promise<WikiData> {
     const cost: CardCost = {
       coins: Number.parseInt(coins),
       debt: debt ? Number.parseInt(debt) : 0,
-      potion: potion === "Yes",
+      potion: potion == "1",
       special: extra as "+" | "*" | null,
     };
     const card: Card = {
