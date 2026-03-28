@@ -187,7 +187,7 @@ interface Card {
   artURL: string;
   imageURL: string;
   instructionsHTML: string;
-  release: string;
+  release: string | null;
 }
 
 interface WikiData {
