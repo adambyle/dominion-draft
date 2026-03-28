@@ -8,9 +8,8 @@ The app needs to collect card data from the Dominion Strategy Wiki
 ([wiki.dominionstrategy.com](https://wiki.dominionstrategy.com)).
 
 The Dominion Strategy Wiki is protected from bots by Anubis. You will need an API key to access
-the API from a script. I do not know how to use such a key yet, so for now I have been ripping
-the `anubis-cookie-auth` cookie from a browser request and setting it as an environment variable
-(see [.env.example](.env.example)).
+the API from a script, which you must obtain from a community member. Set the
+`CLIENT_TOKEN` environment variable to the provided key.
 
 To collect the data, run the [wikiData.ts](scripts/wikiData.ts) script once
 with the following command:
@@ -19,4 +18,4 @@ with the following command:
 npm run wikidata
 ```
 
-This will collect card data in a JSON file in the `data` directory.
+This will collect card data in a JSON file in the `src/lib/data` directory.

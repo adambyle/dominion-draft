@@ -17,8 +17,7 @@ function urlRoot(root: "api" | "index"): string {
 
 // Steal an auth token from a browser cookie to bypass Anubis
 // script-blocker.
-const token = process.env.ANUBIS_TOKEN;
-const cookie = `anubis-cookie-auth=${token}`;
+const token: string = process.env.CLIENT_TOKEN!;
 
 async function wikiFetch(
   root: "api" | "index",
@@ -29,7 +28,7 @@ async function wikiFetch(
   const uri = `${urlRoot(root)}?${params}`;
   const res = await fetch(uri, {
     headers: {
-      Cookie: cookie,
+      "Dominion-Wiki-Client": token,
     },
   });
   return await res.json();
@@ -136,9 +135,9 @@ interface Edition {
   size: number;
   release: string;
   illustrators: string[];
-  art: string;
-  image: string;
-  rulebook: string;
+  artURL: string;
+  imageURL: string;
+  rulebookURL: string;
 }
 
 interface Expansion {
@@ -233,9 +232,9 @@ async function getWikiData(): Promise<WikiData> {
       size: Number.parseInt(rec.Size),
       release: rec["Release Date"],
       illustrators: [],
-      art: rec.Art,
-      image: rec.Image,
-      rulebook: rec.Rulebook,
+      artURL: rec.Art,
+      imageURL: rec.Image,
+      rulebookURL: rec.Rulebook,
     };
     expansion.editions[idx] = edition;
     editionsById[rec._rowID] = edition;
@@ -315,5 +314,8 @@ async function getWikiData(): Promise<WikiData> {
 console.log("Fetching data...");
 const data = await getWikiData();
 console.log("Saving data...");
-await writeFile("data/wikidata.json", JSON.stringify(data, undefined, 2));
+await writeFile(
+  "src/lib/data/wikidata.json",
+  JSON.stringify(data, undefined, 2),
+);
 console.log("Done.");

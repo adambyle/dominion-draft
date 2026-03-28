@@ -20058,9 +20058,9 @@
           "illustrators": [
             "Lorraine Fajardo"
           ],
-          "art": "AdventuresArt.jpg",
-          "image": "Adventures.jpg",
-          "rulebook": "AdventuresRulebook2022.pdf"
+          "artURL": "AdventuresArt.jpg",
+          "imageURL": "Adventures.jpg",
+          "rulebookURL": "AdventuresRulebook2022.pdf"
         }
       ],
       "ordering": 8
@@ -20075,9 +20075,9 @@
           "illustrators": [
             "Claus Stefan"
           ],
-          "art": "AlchemyArt.jpg",
-          "image": "Alchemy.jpg",
-          "rulebook": "AlchemyRulebook2021.pdf"
+          "artURL": "AlchemyArt.jpg",
+          "imageURL": "Alchemy.jpg",
+          "rulebookURL": "AlchemyRulebook2021.pdf"
         }
       ],
       "ordering": 3
@@ -20092,9 +20092,9 @@
           "illustrators": [
             "Lorraine Fajardo"
           ],
-          "art": "AlliesArt.jpg",
-          "image": "Allies.jpg",
-          "rulebook": "AlliesRulebook2021.pdf"
+          "artURL": "AlliesArt.jpg",
+          "imageURL": "Allies.jpg",
+          "rulebookURL": "AlliesRulebook2021.pdf"
         }
       ],
       "ordering": 13
@@ -20109,9 +20109,9 @@
           "illustrators": [
             "?"
           ],
-          "art": "ArcanaArt.jpg",
-          "image": "Arcana.jpg",
-          "rulebook": null
+          "artURL": "ArcanaArt.jpg",
+          "imageURL": "Arcana.jpg",
+          "rulebookURL": null
         }
       ],
       "ordering": 16
@@ -20127,9 +20127,9 @@
             "Matthias Catrein",
             "Alayna Lemmer-Danner"
           ],
-          "art": "Cornucopia & GuildsArt.jpg",
-          "image": "Guilds_&_Cornucopia.jpg",
-          "rulebook": "Cornucopia & GuildsRulebook2017.pdf"
+          "artURL": "Cornucopia & GuildsArt.jpg",
+          "imageURL": "Guilds_&_Cornucopia.jpg",
+          "rulebookURL": "Cornucopia & GuildsRulebook2017.pdf"
         },
         {
           "icon": "Cornucopia & Guilds_icon.png",
@@ -20138,9 +20138,9 @@
           "illustrators": [
             "Jessi J"
           ],
-          "art": "Cornucopia & Guilds2Art.jpg",
-          "image": "Guilds_&_Cornucopia2.jpg",
-          "rulebook": "Cornucopia & GuildsRulebook2023.pdf"
+          "artURL": "Cornucopia & Guilds2Art.jpg",
+          "imageURL": "Guilds_&_Cornucopia2.jpg",
+          "rulebookURL": "Cornucopia & GuildsRulebook2023.pdf"
         }
       ],
       "ordering": 5
@@ -20155,9 +20155,9 @@
           "illustrators": [
             "Raven Mimura"
           ],
-          "art": "Dark AgesArt.jpg",
-          "image": "Dark Ages.jpg",
-          "rulebook": "Dark AgesRulebook2020.pdf"
+          "artURL": "Dark AgesArt.jpg",
+          "imageURL": "Dark Ages.jpg",
+          "rulebookURL": "Dark AgesRulebook2020.pdf"
         }
       ],
       "ordering": 7
@@ -20172,9 +20172,9 @@
           "illustrators": [
             "Matthias Catrein"
           ],
-          "art": "Base1Art.jpg",
-          "image": "Dominion.jpg",
-          "rulebook": "DominionRulebook2008.pdf"
+          "artURL": "Base1Art.jpg",
+          "imageURL": "Dominion.jpg",
+          "rulebookURL": "DominionRulebook2008.pdf"
         },
         {
           "icon": "Dominion_icon.png",
@@ -20183,9 +20183,9 @@
           "illustrators": [
             "Julien Delval"
           ],
-          "art": "BaseArt.jpg",
-          "image": "Dominion2.jpg",
-          "rulebook": "DominionRulebook2021.pdf"
+          "artURL": "BaseArt.jpg",
+          "imageURL": "Dominion2.jpg",
+          "rulebookURL": "DominionRulebook2021.pdf"
         }
       ],
       "ordering": 0
@@ -20201,9 +20201,9 @@
             "Martin Hoffmann",
             "Claus Stephan"
           ],
-          "art": "EmpiresArt.jpg",
-          "image": "Empires.jpg",
-          "rulebook": "EmpiresRulebook2021.pdf"
+          "artURL": "EmpiresArt.jpg",
+          "imageURL": "Empires.jpg",
+          "rulebookURL": "EmpiresRulebook2021.pdf"
         }
       ],
       "ordering": 9
@@ -20218,9 +20218,9 @@
           "illustrators": [
             "Ryan Laukat"
           ],
-          "art": "HinterlandsArt.jpg",
-          "image": "Hinterlands.jpg",
-          "rulebook": "HinterlandsRulebook2016.pdf"
+          "artURL": "HinterlandsArt.jpg",
+          "imageURL": "Hinterlands.jpg",
+          "rulebookURL": "HinterlandsRulebook2016.pdf"
         },
         {
           "icon": "Hinterlands_icon.png",
@@ -20229,9 +20229,9 @@
           "illustrators": [
             "Marcel-André Casasola Merkle"
           ],
-          "art": "Hinterlands2Art.jpg",
-          "image": "Hinterlands2.jpg",
-          "rulebook": "HinterlandsRulebook2022.pdf"
+          "artURL": "Hinterlands2Art.jpg",
+          "imageURL": "Hinterlands2.jpg",
+          "rulebookURL": "HinterlandsRulebook2022.pdf"
         }
       ],
       "ordering": 6
@@ -20246,9 +20246,9 @@
           "illustrators": [
             "Matthias Catrein"
           ],
-          "art": "IntrigueArt.jpg",
-          "image": "Intrigue.jpg",
-          "rulebook": "IntrigueRulebook2009.pdf"
+          "artURL": "IntrigueArt.jpg",
+          "imageURL": "Intrigue.jpg",
+          "rulebookURL": "IntrigueRulebook2009.pdf"
         },
         {
           "icon": "Intrigue_icon.png",
@@ -20257,9 +20257,9 @@
           "illustrators": [
             "Julien Delval"
           ],
-          "art": "Intrigue2Art.jpg",
-          "image": "Intrigue2.jpg",
-          "rulebook": "IntrigueRulebook2022.pdf"
+          "artURL": "Intrigue2Art.jpg",
+          "imageURL": "Intrigue2.jpg",
+          "rulebookURL": "IntrigueRulebook2022.pdf"
         }
       ],
       "ordering": 1
@@ -20274,9 +20274,9 @@
           "illustrators": [
             "Marcel-André Casasola Merkle"
           ],
-          "art": "Menagerie (expansion)Art.jpg",
-          "image": "Menagerie (expansion).jpg",
-          "rulebook": "MenagerieRulebook2020.pdf"
+          "artURL": "Menagerie (expansion)Art.jpg",
+          "imageURL": "Menagerie (expansion).jpg",
+          "rulebookURL": "MenagerieRulebook2020.pdf"
         }
       ],
       "ordering": 12
@@ -20291,9 +20291,9 @@
           "illustrators": [
             "Garret DeChellis"
           ],
-          "art": "NocturneArt.jpg",
-          "image": "Nocturne.jpg",
-          "rulebook": "NocturneRulebook2021.pdf"
+          "artURL": "NocturneArt.jpg",
+          "imageURL": "Nocturne.jpg",
+          "rulebookURL": "NocturneRulebook2021.pdf"
         }
       ],
       "ordering": 10
@@ -20308,9 +20308,9 @@
           "illustrators": [
             "Franz Vohwinkel"
           ],
-          "art": "Plunder (expansion)Art.jpg",
-          "image": "Plunder (expansion).jpg",
-          "rulebook": "PlunderRulebook2022.pdf"
+          "artURL": "Plunder (expansion)Art.jpg",
+          "imageURL": "Plunder (expansion).jpg",
+          "rulebookURL": "PlunderRulebook2022.pdf"
         }
       ],
       "ordering": 14
@@ -20323,9 +20323,9 @@
           "size": null,
           "release": null,
           "illustrators": [],
-          "art": null,
-          "image": null,
-          "rulebook": null
+          "artURL": null,
+          "imageURL": null,
+          "rulebookURL": null
         }
       ],
       "ordering": 99
@@ -20340,9 +20340,9 @@
           "illustrators": [
             "Harald Lieske"
           ],
-          "art": "ProsperityArt.jpg",
-          "image": "Prosperity.jpg",
-          "rulebook": "ProsperityRulebook2019.pdf"
+          "artURL": "ProsperityArt.jpg",
+          "imageURL": "Prosperity.jpg",
+          "rulebookURL": "ProsperityRulebook2019.pdf"
         },
         {
           "icon": "Prosperity_icon.png",
@@ -20351,9 +20351,9 @@
           "illustrators": [
             "Harald Lieske"
           ],
-          "art": "Prosperity2Art.jpg",
-          "image": "Prosperity2.jpg",
-          "rulebook": "ProsperityRulebook2022.pdf"
+          "artURL": "Prosperity2Art.jpg",
+          "imageURL": "Prosperity2.jpg",
+          "rulebookURL": "ProsperityRulebook2022.pdf"
         }
       ],
       "ordering": 4
@@ -20368,9 +20368,9 @@
           "illustrators": [
             "Grant Hansen"
           ],
-          "art": "RenaissanceArt.jpg",
-          "image": "Renaissance.jpg",
-          "rulebook": "RenaissanceRulebook2021.pdf"
+          "artURL": "RenaissanceArt.jpg",
+          "imageURL": "Renaissance.jpg",
+          "rulebookURL": "RenaissanceRulebook2021.pdf"
         }
       ],
       "ordering": 11
@@ -20385,9 +20385,9 @@
           "illustrators": [
             "Lorraine Fajardo"
           ],
-          "art": "Rising SunArt.jpg",
-          "image": "Rising Sun.jpg",
-          "rulebook": "Rising SunRulebook2024.pdf"
+          "artURL": "Rising SunArt.jpg",
+          "imageURL": "Rising Sun.jpg",
+          "rulebookURL": "Rising SunRulebook2024.pdf"
         }
       ],
       "ordering": 15
@@ -20402,9 +20402,9 @@
           "illustrators": [
             "Franz Vohwinkel"
           ],
-          "art": "SeasideArt.jpg",
-          "image": "Seaside.jpg",
-          "rulebook": "SeasideRulebook2020.pdf"
+          "artURL": "SeasideArt.jpg",
+          "imageURL": "Seaside.jpg",
+          "rulebookURL": "SeasideRulebook2020.pdf"
         },
         {
           "icon": "Seaside icon.png",
@@ -20413,9 +20413,9 @@
           "illustrators": [
             "Julien Delval"
           ],
-          "art": "Seaside2Art.jpg",
-          "image": "Seaside2.jpg",
-          "rulebook": "SeasideRulebook2022.pdf"
+          "artURL": "Seaside2Art.jpg",
+          "imageURL": "Seaside2.jpg",
+          "rulebookURL": "SeasideRulebook2022.pdf"
         }
       ],
       "ordering": 2

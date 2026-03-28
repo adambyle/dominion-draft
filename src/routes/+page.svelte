@@ -1,2 +1,11 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<script lang="ts">
+    import game from "$lib/data/game";
+
+    const cards = Array.from(game.cards.values()).sort((a, b) =>
+        a.name.localeCompare(b.name),
+    );
+</script>
+
+{#each cards as card}
+    <p>{card.name}</p>
+{/each}
