@@ -1,5 +1,6 @@
 import process from "process";
 import dotenv from "dotenv";
+import he from "he";
 import { writeFile } from "fs/promises";
 
 dotenv.config({
@@ -89,7 +90,15 @@ async function cargoExport<T extends Table>(
     offset: String(offset),
     fields,
   });
-  return await wikiFetch("index", params);
+  const records = await wikiFetch("index", params);
+  for (const record of records) {
+    for (const prop in record) {
+      if (typeof record[prop] === "string") {
+        record[prop] = he.decode(record[prop]);
+      }
+    }
+  }
+  return records;
 }
 
 async function cargoExportAll<T extends Table>(
@@ -124,7 +133,7 @@ type CardTypeScope =
 interface CardType {
   name: string;
   scope: CardTypeScope;
-  introduced: Expansion;
+  introduced: string;
 }
 
 interface CardCost {
@@ -145,17 +154,17 @@ type CardPurpose =
 interface Card {
   name: string;
   purpose: CardPurpose;
-  expansion: Expansion;
+  expansion: string;
   editions: (1 | 2)[];
-  cardTypes: CardType[];
+  cardTypes: string[];
   cost: CardCost;
   image: string;
 }
 
 interface WikiData {
-  expansions: Map<string, Expansion>;
-  cardTypes: Map<string, CardType>;
-  cards: Map<string, Card>;
+  expansions: Record<string, Expansion>;
+  cardTypes: Record<string, CardType>;
+  cards: Record<string, Card>;
 }
 
 async function getWikiData(): Promise<WikiData> {
@@ -176,33 +185,31 @@ async function getWikiData(): Promise<WikiData> {
     typeRecords,
   ] = await Promise.all(requests);
 
-  const expansions = new Map<string, Expansion>();
+  const expansions: Record<string, Expansion> = {};
   for (const rec of expansionRecords) {
-    const editionCount = Number.parseInt(rec.Latest);
-    expansions.set(rec.Name, {
+    expansions[rec.Name] = {
       name: rec.Name,
-      editions: Array(editionCount),
+      editions: [],
       ordering: Number.parseInt(rec.Ordering),
-    });
+    };
   }
   for (const rec of editionRecords) {
     const idx = Number.parseInt(rec.Edition) - 1;
-    const expansion = expansions.get(rec.Expansion)!;
+    const expansion = expansions[rec.Expansion];
     expansion.editions[idx] = { icon: rec.Icon };
   }
 
-  const cardTypes = new Map<string, CardType>();
+  const cardTypes: Record<string, CardType> = {};
   for (const rec of typeRecords) {
-    const expansion = expansions.get(rec.Introduced)!;
-    cardTypes.set(rec.Name, {
+    cardTypes[rec.Name] = {
       name: rec.Name,
       scope: rec.Scope as CardTypeScope,
-      introduced: expansion,
-    });
+      introduced: rec.Introduced,
+    };
   }
 
-  const cards = new Map<string, Card>();
-  const cardsById = new Map<string, Card>();
+  const cards: Record<string, Card> = {};
+  const cardsById: Record<string, Card | undefined> = {};
   for (const rec of componentRecords) {
     const coins = rec["Cost Coin"];
     const debt = rec["Cost Debt"];
@@ -214,23 +221,20 @@ async function getWikiData(): Promise<WikiData> {
       potion: potion === "Yes",
       special: extra as "+" | "*" | null,
     };
-    const expansion = expansions.get(rec.Expansion)!;
     const card: Card = {
       name: rec.Name,
       cardTypes: [],
       cost,
-      editions: Array(expansion.editions.length),
-      expansion,
+      editions: [],
+      expansion: rec.Expansion,
       image: rec.Image,
       purpose: rec.Purpose as CardPurpose,
     };
-    cards.set(rec.Name, card);
-    cardsById.set(rec._rowID, card);
-  }
-  for (const [id, card] of cardsById) {
+    cards[rec.Name] = card;
+    cardsById[rec._rowID] = card;
   }
   for (const rec of componentEditionRecords) {
-    const card = cardsById.get(rec._rowID);
+    const card = cardsById[rec._rowID];
     if (!card) {
       // There are some stale rows.
       continue;
@@ -240,14 +244,13 @@ async function getWikiData(): Promise<WikiData> {
     card.editions[idx] = edition as 1 | 2;
   }
   for (const rec of componentTypeRecords) {
-    const card = cardsById.get(rec._rowID);
+    const card = cardsById[rec._rowID];
     if (!card) {
       // There are some stale rows.
       continue;
     }
     const idx = Number.parseInt(rec._position) - 1;
-    const type = cardTypes.get(rec._value[0])!;
-    card.cardTypes[idx] = type;
+    card.cardTypes[idx] = rec._value[0];
   }
 
   return { cards, expansions, cardTypes };
@@ -256,4 +259,5 @@ async function getWikiData(): Promise<WikiData> {
 console.log("Fetching data...");
 const data = await getWikiData();
 console.log("Saving data...");
-await writeFile("data/wikidata.json", JSON.stringify(data));
+await writeFile("data/wikidata.json", JSON.stringify(data, undefined, 2));
+console.log("Done.");
