@@ -1,112 +1,32 @@
 import process from "process";
 import dotenv from "dotenv";
+import { writeFile } from "fs/promises";
 
 dotenv.config({
   quiet: true,
 });
 
+// Enable async.
 export {};
 
 // Dominion Strategy Wiki MediaWiki API.
-const API_ROOT = "https://wiki.dominionstrategy.com/api.php";
+function urlRoot(root: "api" | "index"): string {
+  return `https://wiki.dominionstrategy.com/${root}.php`;
+}
 
+// Steal an auth token from a browser cookie to bypass Anubis
+// script-blocker.
 const token = process.env.ANUBIS_TOKEN;
 const cookie = `anubis-cookie-auth=${token}`;
 
-interface MediaWikiError {
-  error: {
-    code: string;
-    info: string;
-    docref: string;
-  };
-}
-
-type ComponentColumn =
-  | "Name"
-  | "Expansion"
-  | "Edition"
-  | "Purpose"
-  | "Types"
-  | "Quantity"
-  | ["Cost_Coin", "Cost Coin"]
-  | ["Cost_Potion", "Cost Potion"]
-  | ["Cost_Debt", "Cost Debt"]
-  | ["Cost_Extra", "Cost Extra"]
-  | "Illustrator"
-  | "Art"
-  | "Image"
-  | "Instructions"
-  | ["Release_Date", "Release Date"];
-
-const COMPONENT_FIELDS_BY_INCLUDE = {
-  name: ["Name"],
-  working: [
-    // Some columns don't seem to be working from the API right now.
-    "Name",
-    "Expansion",
-    "Purpose",
-    ["Cost_Coin", "Cost Coin"],
-    ["Cost_Potion", "Cost Potion"],
-    ["Cost_Debt", "Cost Debt"],
-    ["Cost_Extra", "Cost Extra"],
-    "Image",
-  ],
-  full: [
-    "Name",
-    "Expansion",
-    "Edition",
-    "Purpose",
-    "Types",
-    ["Cost_Coin", "Cost Coin"],
-    ["Cost_Potion", "Cost Potion"],
-    ["Cost_Debt", "Cost Debt"],
-    ["Cost_Extra", "Cost Extra"],
-    "Image",
-  ],
-} as const satisfies Record<string, ComponentColumn[]>;
-
-type ComponentInclude = keyof typeof COMPONENT_FIELDS_BY_INCLUDE;
-
-function componentRequestFields(include: ComponentInclude) {
-  return COMPONENT_FIELDS_BY_INCLUDE[include].map((field) => {
-    if (typeof field === "string") {
-      return field;
-    } else {
-      return field[0];
-    }
-  });
-}
-
-type StringOrSecondString<
-  Arr extends readonly (string | readonly [string, string])[],
-> = {
-  [K in keyof Arr]: Arr[K] extends string ? Arr[K] : Arr[K][1];
-};
-
-interface ComponentRecord<I extends ComponentInclude> {
-  title: Record<
-    StringOrSecondString<(typeof COMPONENT_FIELDS_BY_INCLUDE)[I]>[number],
-    string
-  >;
-}
-
-interface ComponentResponse<I extends ComponentInclude> {
-  cargoquery: ComponentRecord<I>[];
-}
-
-interface ParsePageResponse {
-  parse: {
-    title: string;
-    pageid: number;
-    wikitext: string;
-  };
-}
-
-async function mediaWikiAPI(
+async function wikiFetch(
+  root: "api" | "index",
   params: URLSearchParams,
-): Promise<MediaWikiError | any> {
-  const url = `${API_ROOT}?${params}`;
-  const res = await fetch(url, {
+): Promise<any> {
+  params.append("format", "json");
+  params.append("formatversion", "2");
+  const uri = `${urlRoot(root)}?${params}`;
+  const res = await fetch(uri, {
     headers: {
       Cookie: cookie,
     },
@@ -114,58 +34,226 @@ async function mediaWikiAPI(
   return await res.json();
 }
 
-async function getComponents<I extends ComponentInclude>(
-  include: I,
+type Field = string | readonly [string, string];
+
+const COMPONENT_FIELDS = [
+  "_rowID",
+  "Name",
+  "Expansion",
+  "Purpose",
+  ["Cost_Coin", "Cost Coin"],
+  ["Cost_Potion", "Cost Potion"],
+  ["Cost_Debt", "Cost Debt"],
+  ["Cost_Extra", "Cost Extra"],
+  "Image",
+] as const;
+
+const COMPONENT_SUBTABLE_FIELDS = ["_rowID", "_value", "_position"] as const;
+const EDITION_FIELDS = ["Expansion", "Edition", "Icon"] as const;
+const EXPANSION_FIELDS = ["Name", "Ordering", "Latest"] as const;
+const TYPE_FIELDS = ["Name", "Scope", "Introduced"] as const;
+
+const TABLE_FIELDS = {
+  Components: COMPONENT_FIELDS,
+  Components__Edition: COMPONENT_SUBTABLE_FIELDS,
+  Components__Types: COMPONENT_SUBTABLE_FIELDS,
+  Editions: EDITION_FIELDS,
+  Expansions: EXPANSION_FIELDS,
+  Types: TYPE_FIELDS,
+} as const;
+
+type Table = keyof typeof TABLE_FIELDS;
+
+type TableField<T extends Table> = (typeof TABLE_FIELDS)[T][number];
+
+function requestFields<T extends Table>(table: T): string[] {
+  const fields = TABLE_FIELDS[table];
+  return fields.map((field) => (typeof field === "string" ? field : field[0]));
+}
+
+type ResponseField<F extends Field> = F extends string ? F : F[1];
+
+type ResponseRecord<T extends Table> = {
+  [K in ResponseField<TableField<T>>]: K extends "_value" ? [string] : string;
+};
+
+async function cargoExport<T extends Table>(
+  table: T,
   offset = 0,
-): Promise<MediaWikiError | ComponentResponse<I>> {
-  const fields = componentRequestFields(include).join(",");
+): Promise<ResponseRecord<T>[]> {
+  const fields = requestFields(table).join(",");
   const params = new URLSearchParams({
-    action: "cargoquery",
-    format: "json",
-    tables: "Components",
-    fields,
+    title: "Special:CargoExport",
+    tables: table,
     limit: "max",
     offset: String(offset),
-    formatversion: "2",
+    fields,
   });
-  return await mediaWikiAPI(params);
+  return await wikiFetch("index", params);
 }
 
-async function getAllComponents<I extends ComponentInclude>(
-  include: I,
-): Promise<MediaWikiError | ComponentRecord<I>[]> {
-  const allRecords: ComponentRecord<I>[] = [];
-  let count: number;
+async function cargoExportAll<T extends Table>(
+  table: T,
+): Promise<ResponseRecord<T>[]> {
+  const records: ResponseRecord<T>[] = [];
+  let count;
   do {
-    const offset = allRecords.length;
-    const response = await getComponents(include, offset);
-    if ("error" in response) {
-      return response;
-    }
-    const records = response.cargoquery;
-    allRecords.push(...records);
-    count = records.length;
+    const offset = records.length;
+    const page = await cargoExport(table, offset);
+    records.push(...page);
+    count = page.length;
   } while (count);
-  return allRecords;
+  return records;
 }
 
-async function parsePage(
-  page: string,
-): Promise<MediaWikiError | ParsePageResponse> {
-  const params = new URLSearchParams({
-    action: "parse",
-    format: "json",
-    page,
-    prop: "wikitext",
-    formatversion: "2",
-  });
-  return await mediaWikiAPI(params);
+interface Expansion {
+  name: string;
+  ordering: number;
+  editions: {
+    icon: string;
+  }[];
 }
 
-const allRecords = await getAllComponents("working");
-if ("error" in allRecords) {
-  console.log("Error:", allRecords);
-} else {
-  const record = allRecords[0];
-  console.log(record.title);
+type CardTypeScope =
+  | "Basic"
+  | "Landscape"
+  | "Multi-expansion"
+  | "Single-expansion"
+  | "Single-pile";
+
+interface CardType {
+  name: string;
+  scope: CardTypeScope;
+  introduced: Expansion;
 }
+
+interface CardCost {
+  coins: number;
+  debt: number;
+  potion: boolean;
+  special: "+" | "*" | null;
+}
+
+type CardPurpose =
+  | "Basic"
+  | "Kingdom Pile"
+  | "Landscape"
+  | "Mixed Pile Card"
+  | "Non-Supply"
+  | "Status";
+
+interface Card {
+  name: string;
+  purpose: CardPurpose;
+  expansion: Expansion;
+  editions: (1 | 2)[];
+  cardTypes: CardType[];
+  cost: CardCost;
+  image: string;
+}
+
+interface WikiData {
+  expansions: Map<string, Expansion>;
+  cardTypes: Map<string, CardType>;
+  cards: Map<string, Card>;
+}
+
+async function getWikiData(): Promise<WikiData> {
+  const requests = [
+    cargoExportAll("Components"),
+    cargoExportAll("Components__Edition"),
+    cargoExportAll("Components__Types"),
+    cargoExportAll("Editions"),
+    cargoExportAll("Expansions"),
+    cargoExportAll("Types"),
+  ] as const;
+  const [
+    componentRecords,
+    componentEditionRecords,
+    componentTypeRecords,
+    editionRecords,
+    expansionRecords,
+    typeRecords,
+  ] = await Promise.all(requests);
+
+  const expansions = new Map<string, Expansion>();
+  for (const rec of expansionRecords) {
+    const editionCount = Number.parseInt(rec.Latest);
+    expansions.set(rec.Name, {
+      name: rec.Name,
+      editions: Array(editionCount),
+      ordering: Number.parseInt(rec.Ordering),
+    });
+  }
+  for (const rec of editionRecords) {
+    const idx = Number.parseInt(rec.Edition) - 1;
+    const expansion = expansions.get(rec.Expansion)!;
+    expansion.editions[idx] = { icon: rec.Icon };
+  }
+
+  const cardTypes = new Map<string, CardType>();
+  for (const rec of typeRecords) {
+    const expansion = expansions.get(rec.Introduced)!;
+    cardTypes.set(rec.Name, {
+      name: rec.Name,
+      scope: rec.Scope as CardTypeScope,
+      introduced: expansion,
+    });
+  }
+
+  const cards = new Map<string, Card>();
+  const cardsById = new Map<string, Card>();
+  for (const rec of componentRecords) {
+    const coins = rec["Cost Coin"];
+    const debt = rec["Cost Debt"];
+    const potion = rec["Cost Potion"];
+    const extra = rec["Cost Extra"];
+    const cost: CardCost = {
+      coins: Number.parseInt(coins),
+      debt: debt ? Number.parseInt(debt) : 0,
+      potion: potion === "Yes",
+      special: extra as "+" | "*" | null,
+    };
+    const expansion = expansions.get(rec.Expansion)!;
+    const card: Card = {
+      name: rec.Name,
+      cardTypes: [],
+      cost,
+      editions: Array(expansion.editions.length),
+      expansion,
+      image: rec.Image,
+      purpose: rec.Purpose as CardPurpose,
+    };
+    cards.set(rec.Name, card);
+    cardsById.set(rec._rowID, card);
+  }
+  for (const [id, card] of cardsById) {
+  }
+  for (const rec of componentEditionRecords) {
+    const card = cardsById.get(rec._rowID);
+    if (!card) {
+      // There are some stale rows.
+      continue;
+    }
+    const idx = Number.parseInt(rec._position) - 1;
+    const edition = Number.parseInt(rec._value[0]);
+    card.editions[idx] = edition as 1 | 2;
+  }
+  for (const rec of componentTypeRecords) {
+    const card = cardsById.get(rec._rowID);
+    if (!card) {
+      // There are some stale rows.
+      continue;
+    }
+    const idx = Number.parseInt(rec._position) - 1;
+    const type = cardTypes.get(rec._value[0])!;
+    card.cardTypes[idx] = type;
+  }
+
+  return { cards, expansions, cardTypes };
+}
+
+console.log("Fetching data...");
+const data = await getWikiData();
+console.log("Saving data...");
+await writeFile("data/wikidata.json", JSON.stringify(data));
