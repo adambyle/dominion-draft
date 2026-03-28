@@ -42,23 +42,39 @@ const COMPONENT_FIELDS = [
   "Name",
   "Expansion",
   "Purpose",
+  "Quantity",
   ["Cost_Coin", "Cost Coin"],
   ["Cost_Potion", "Cost Potion"],
   ["Cost_Debt", "Cost Debt"],
   ["Cost_Extra", "Cost Extra"],
+  "Illustrator",
+  "Art",
   "Image",
+  "Instructions",
+  ["Release_Date", "Release Date"],
 ] as const;
 
-const COMPONENT_SUBTABLE_FIELDS = ["_rowID", "_value", "_position"] as const;
-const EDITION_FIELDS = ["Expansion", "Edition", "Icon"] as const;
+const SUBTABLE_FIELDS = ["_rowID", "_value", "_position"] as const;
+const EDITION_FIELDS = [
+  "_rowID",
+  "Expansion",
+  "Edition",
+  "Size",
+  ["Release_Date", "Release Date"],
+  "Icon",
+  "Art",
+  "Image",
+  "Rulebook",
+] as const;
 const EXPANSION_FIELDS = ["Name", "Ordering", "Latest"] as const;
 const TYPE_FIELDS = ["Name", "Scope", "Introduced"] as const;
 
 const TABLE_FIELDS = {
   Components: COMPONENT_FIELDS,
-  Components__Edition: COMPONENT_SUBTABLE_FIELDS,
-  Components__Types: COMPONENT_SUBTABLE_FIELDS,
+  Components__Edition: SUBTABLE_FIELDS,
+  Components__Types: SUBTABLE_FIELDS,
   Editions: EDITION_FIELDS,
+  Editions__Illustrator: SUBTABLE_FIELDS,
   Expansions: EXPANSION_FIELDS,
   Types: TYPE_FIELDS,
 } as const;
@@ -115,12 +131,20 @@ async function cargoExportAll<T extends Table>(
   return records;
 }
 
+interface Edition {
+  icon: string;
+  size: number;
+  release: string;
+  illustrators: string[];
+  art: string;
+  image: string;
+  rulebook: string;
+}
+
 interface Expansion {
   name: string;
   ordering: number;
-  editions: {
-    icon: string;
-  }[];
+  editions: Edition[];
 }
 
 type CardTypeScope =
@@ -158,7 +182,12 @@ interface Card {
   editions: (1 | 2)[];
   cardTypes: string[];
   cost: CardCost;
-  image: string;
+  quantity: number;
+  illustrator: string;
+  artURL: string;
+  imageURL: string;
+  instructionsHTML: string;
+  release: string;
 }
 
 interface WikiData {
@@ -173,6 +202,7 @@ async function getWikiData(): Promise<WikiData> {
     cargoExportAll("Components__Edition"),
     cargoExportAll("Components__Types"),
     cargoExportAll("Editions"),
+    cargoExportAll("Editions__Illustrator"),
     cargoExportAll("Expansions"),
     cargoExportAll("Types"),
   ] as const;
@@ -181,11 +211,13 @@ async function getWikiData(): Promise<WikiData> {
     componentEditionRecords,
     componentTypeRecords,
     editionRecords,
+    editionIllustratorRecords,
     expansionRecords,
     typeRecords,
   ] = await Promise.all(requests);
 
   const expansions: Record<string, Expansion> = {};
+  const editionsById: Record<string, Edition | undefined> = {};
   for (const rec of expansionRecords) {
     expansions[rec.Name] = {
       name: rec.Name,
@@ -196,7 +228,26 @@ async function getWikiData(): Promise<WikiData> {
   for (const rec of editionRecords) {
     const idx = Number.parseInt(rec.Edition) - 1;
     const expansion = expansions[rec.Expansion];
-    expansion.editions[idx] = { icon: rec.Icon };
+    const edition: Edition = {
+      icon: rec.Icon,
+      size: Number.parseInt(rec.Size),
+      release: rec["Release Date"],
+      illustrators: [],
+      art: rec.Art,
+      image: rec.Image,
+      rulebook: rec.Rulebook,
+    };
+    expansion.editions[idx] = edition;
+    editionsById[rec._rowID] = edition;
+  }
+  for (const rec of editionIllustratorRecords) {
+    const edition = editionsById[rec._rowID];
+    const idx = Number.parseInt(rec._position) - 1;
+    if (!edition) {
+      // There are some stale rows.
+      continue;
+    }
+    edition.illustrators[idx] = rec._value[0];
   }
 
   const cardTypes: Record<string, CardType> = {};
@@ -227,7 +278,12 @@ async function getWikiData(): Promise<WikiData> {
       cost,
       editions: [],
       expansion: rec.Expansion,
-      image: rec.Image,
+      quantity: Number.parseInt(rec.Quantity),
+      illustrator: rec.Illustrator,
+      artURL: rec.Art,
+      imageURL: rec.Image,
+      instructionsHTML: rec.Instructions,
+      release: rec["Release Date"],
       purpose: rec.Purpose as CardPurpose,
     };
     cards[rec.Name] = card;
